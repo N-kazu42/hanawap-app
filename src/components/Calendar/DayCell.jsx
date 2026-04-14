@@ -45,15 +45,15 @@ export default function DayCell({
         </div>
       )}
 
-      {/* メンバー空き状況ドット（候補・確定イベントがない日） */}
-      {!isEvent && !isCandidate && (
+      {/* メンバー空き状況ドット（確定イベントがない日は常に表示） */}
+      {!isEvent && (
         <div className="flex gap-0.5 mt-0.5">
           {MEMBERS.map(m => {
             const status = avail[m.id]
             const color  = status === '○' ? m.color
                          : status === '△' ? '#FCD34D'
                          : status === '×' ? '#E5E7EB'
-                         : '#F3F4F6'
+                         : 'transparent'
             return <div key={m.id} className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
           })}
         </div>

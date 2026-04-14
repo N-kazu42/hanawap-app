@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   collection, doc, onSnapshot, setDoc, deleteDoc,
-  query, orderBy, addDoc, updateDoc
+  query, orderBy, addDoc, updateDoc, deleteField
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
 
@@ -11,11 +11,15 @@ export function useAvailability(yearMonth) {
   useEffect(() => {
     if (!yearMonth) return
     const ref = collection(db, 'availability', yearMonth, 'days')
-    return onSnapshot(ref, snap => {
-      const result = {}
-      snap.forEach(d => { result[d.id] = d.data() })
-      setData(result)
-    })
+    return onSnapshot(
+      ref,
+      snap => {
+        const result = {}
+        snap.forEach(d => { result[d.id] = d.data() })
+        setData(result)
+      },
+      err => { console.error('useAvailability error:', err) }
+    )
   }, [yearMonth])
   return data
 }
@@ -30,9 +34,11 @@ export function useCandidates() {
   const [candidates, setCandidates] = useState([])
   useEffect(() => {
     const ref = query(collection(db, 'candidates'), orderBy('date'))
-    return onSnapshot(ref, snap => {
-      setCandidates(snap.docs.map(d => ({ id: d.id, ...d.data() })))
-    })
+    return onSnapshot(
+      ref,
+      snap => { setCandidates(snap.docs.map(d => ({ id: d.id, ...d.data() }))) },
+      err  => { console.error('useCandidates error:', err) }
+    )
   }, [])
   return candidates
 }
@@ -48,7 +54,8 @@ export async function addCandidate(data) {
 
 export async function updateVote(candidateId, memberId, vote) {
   const ref = doc(db, 'candidates', candidateId)
-  await updateDoc(ref, { [`votes.${memberId}`]: vote })
+  // null のときはフィールドを削除（null を保存すると集計がずれる）
+  await updateDoc(ref, { [`votes.${memberId}`]: vote === null ? deleteField() : vote })
 }
 
 export async function confirmCandidate(candidateId) {

@@ -1,5 +1,5 @@
 import {
-  initializeAuth, browserLocalPersistence,
+  initializeAuth, browserLocalPersistence, browserPopupRedirectResolver,
   GoogleAuthProvider, signInWithPopup, signOut,
   signInWithEmailAndPassword
 } from 'firebase/auth'
@@ -7,7 +7,8 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { app, db } from './config'
 
 export const auth = initializeAuth(app, {
-  persistence: browserLocalPersistence
+  persistence: browserLocalPersistence,
+  popupRedirectResolver: browserPopupRedirectResolver,
 })
 export const googleProvider = new GoogleAuthProvider()
 
@@ -19,7 +20,7 @@ export function isOwner(user) {
 }
 
 // Firestoreにユーザードキュメントを作成（初回のみ）
-async function ensureUserDoc(user) {
+export async function ensureUserDoc(user) {
   const ref = doc(db, 'users', user.uid)
   const snap = await getDoc(ref)
   if (!snap.exists()) {
@@ -36,7 +37,7 @@ async function ensureUserDoc(user) {
   }
 }
 
-// Googleでサインイン
+// Googleでサインイン（ポップアップ方式）
 export async function signInWithGoogle() {
   const result = await signInWithPopup(auth, googleProvider)
   await ensureUserDoc(result.user)

@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Check } from 'lucide-react'
 import { MEMBERS } from '../../firebase/config'
-import { useCandidates, updateVote, deleteCandidate } from '../../hooks/useFirestore'
+import { useCandidates, updateVote, deleteCandidate, confirmCandidate } from '../../hooks/useFirestore'
 import { formatDateInfo } from '../../utils/holidays'
 import CandidateForm from './CandidateForm'
 
