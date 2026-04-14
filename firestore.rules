@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 承認済みユーザーかどうかを確認するヘルパー関数
+    function isApproved() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
+    }
+
+    // オーナーかどうかを確認するヘルパー関数
+    function isOwner() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner';
+    }
+
+    // ---- usersコレクション ----
+    match /users/{uid} {
+      // 自分自身のドキュメントは読み書き可能（初回ログイン登録用）
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid;
+
+      // オーナーは全ユーザーの読み書き可能（承認操作用）
+      allow read, write: if isOwner();
+    }
+
+    // ---- 空き状況 ----
+    match /availability/{yearMonth}/days/{date} {
+      allow read: if isApproved();
+      allow write: if isApproved();
+    }
+
+    // ---- 候補日 ----
+    match /candidates/{candidateId} {
+      allow read: if isApproved();
+      allow create: if isApproved();
+      allow update: if isApproved();
+      allow delete: if isApproved();
+    }
+
+    // ---- 確定イベント ----
+    match /events/{eventId} {
+      allow read: if isApproved();
+      allow create: if isApproved();
+      allow update: if isApproved();
+      allow delete: if isApproved();
+    }
+  }
+}
