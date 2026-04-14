@@ -54,6 +54,13 @@ export default function CandidateList() {
     await deleteCandidate(id)
   }
 
+  async function handleConfirmAll() {
+    const unconfirmed = candidates.filter(c => !c.confirmed)
+    if (unconfirmed.length === 0) return
+    if (!window.confirm(`未確定の${unconfirmed.length}日間を一括確定しますか？`)) return
+    await Promise.all(unconfirmed.map(c => confirmCandidate(c.id)))
+  }
+
   return (
     <div className="pb-24">
       {/* ヘッダー */}
@@ -127,7 +134,7 @@ export default function CandidateList() {
 
             return (
               <div key={c.id}
-                className={`border-b border-gray-50 last:border-0 ${allOk ? 'bg-green-50' : ''}`}>
+                className={`border-b border-gray-50 last:border-0 ${c.confirmed ? 'bg-green-50' : allOk ? 'bg-green-50' : ''}`}>
                 <div className="grid items-center px-3 py-3"
                   style={{ gridTemplateColumns: '1fr auto auto auto auto' }}>
 
@@ -178,12 +185,30 @@ export default function CandidateList() {
 
                   {/* 集計 */}
                   <div className="w-16 flex justify-center">
-                    <VoteSummary votes={c.votes} />
+                    {c.confirmed
+                      ? <span className="text-xs font-bold text-green-600 flex items-center gap-0.5"><Check size={12} />確定</span>
+                      : <VoteSummary votes={c.votes} />
+                    }
                   </div>
                 </div>
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* 一括保存ボタン */}
+      {candidates.some(c => !c.confirmed) && (
+        <div className="px-3 mt-3">
+          <button
+            onClick={handleConfirmAll}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl
+                       text-white font-bold text-sm shadow-md active:scale-95 transition-transform"
+            style={{ background: 'linear-gradient(135deg, #16a34a, #22c55e)' }}
+          >
+            <Check size={16} />
+            候補日をすべて確定（保存）
+          </button>
         </div>
       )}
 

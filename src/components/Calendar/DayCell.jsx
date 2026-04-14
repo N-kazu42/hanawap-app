@@ -1,7 +1,7 @@
 import { MEMBERS } from '../../firebase/config'
 
 export default function DayCell({
-  day, avail, isEvent, isCandidate, candidateAllOk,
+  day, avail, isEvent, isCandidate, candidateAllOk, candidateVotes,
   isToday, isSun, isSat, isHoliday, holidayName, isSelected, onClick
 }) {
   const isRed = isSun || isHoliday
@@ -41,19 +41,18 @@ export default function DayCell({
       {/* 候補日マーカー（確定イベントがない日のみ） */}
       {!isEvent && isCandidate && (
         <div className={`text-xs leading-none mt-0.5 ${candidateAllOk ? 'text-green-500' : 'text-yellow-500'}`}>
-          {candidateAllOk ? '◎' : '？'}
+          {candidateAllOk ? '☑' : '？'}
         </div>
       )}
 
-      {/* メンバー空き状況ドット（確定イベントがない日は常に表示） */}
+      {/* メンバードット：候補日は投票結果・それ以外は入力予定 */}
       {!isEvent && (
         <div className="flex gap-0.5 mt-0.5">
           {MEMBERS.map(m => {
-            const status = avail[m.id]
-            const color  = status === '○' ? m.color
-                         : status === '△' ? '#FCD34D'
-                         : status === '×' ? '#E5E7EB'
-                         : 'transparent'
+            const status = isCandidate
+              ? (candidateVotes?.[m.id] ?? '')   // 投票データ
+              : (avail[m.id] ?? '')               // 入力予定データ
+            const color = status === '○' ? m.color : 'transparent'
             return <div key={m.id} className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
           })}
         </div>

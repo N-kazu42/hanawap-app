@@ -4,7 +4,7 @@ import { CalendarDays, Vote, CheckCircle, PencilLine } from 'lucide-react'
 const tabs = [
   { to: '/',            icon: CalendarDays, label: 'カレンダー' },
   { to: '/candidates',  icon: Vote,         label: '投票'       },
-  { to: '/events',      icon: CheckCircle,  label: '確定'       },
+  { to: '/events',      icon: CheckCircle,  label: '山予定'     },
   { to: '/availability',icon: PencilLine,   label: '入力'       },
 ]
 

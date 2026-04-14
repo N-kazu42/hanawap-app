@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { MEMBERS } from '../../firebase/config'
 import { useAvailability, useEvents, useCandidates } from '../../hooks/useFirestore'
 import { formatDateInfo, getHolidaysOfMonth } from '../../utils/holidays'
 import DayCell from './DayCell'
+import EventForm from '../Events/EventForm'
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -19,6 +20,7 @@ export default function CalendarView() {
   const holidays     = getHolidaysOfMonth(yearMonth)
 
   const [selectedDay, setSelectedDay] = useState(null)
+  const [showEventForm, setShowEventForm] = useState(false)
 
   const monthEvents     = events.filter(e => e.date?.startsWith(yearMonth))
   const monthCandidates = candidates.filter(c => c.date?.startsWith(yearMonth))
@@ -66,7 +68,7 @@ export default function CalendarView() {
           </div>
         ))}
         <div className="flex items-center gap-1">
-          <span className="font-bold text-green-500">◎</span>全員OK候補
+          <span className="font-bold text-green-500">☑</span>全員入力済
         </div>
         <div className="flex items-center gap-1">
           <span className="font-bold text-yellow-500">？</span>投票中
@@ -94,7 +96,7 @@ export default function CalendarView() {
             const isEvent      = monthEvents.some(e => e.date === dateStr)
             const candidate    = candidateMap[dateStr]
             const isCandidate  = !!candidate
-            const candidateAllOk = isCandidate && MEMBERS.every(m => candidate.votes?.[m.id] === '○')
+            const candidateAllOk = isCandidate && (candidate.confirmed || MEMBERS.every(m => candidate.votes?.[m.id] === '○'))
             const isToday      = day === today.getDate() && month === today.getMonth()+1 && year === today.getFullYear()
             const dow          = (firstDay + day - 1) % 7
             const holidayName  = holidays[dateStr] ?? null
@@ -106,13 +108,17 @@ export default function CalendarView() {
                 isEvent={isEvent}
                 isCandidate={isCandidate}
                 candidateAllOk={candidateAllOk}
+                candidateVotes={candidate?.votes ?? null}
                 isToday={isToday}
                 isSun={dow === 0}
                 isSat={dow === 6}
                 isHoliday={holidayName !== null}
                 holidayName={holidayName}
                 isSelected={selectedDay === day}
-                onClick={() => setSelectedDay(selectedDay === day ? null : day)}
+                onClick={() => {
+                  setSelectedDay(selectedDay === day ? null : day)
+                  setShowEventForm(false)
+                }}
               />
             )
           })}
@@ -123,17 +129,36 @@ export default function CalendarView() {
       {selectedDay && selectedInfo && (
         <div className="mt-3 bg-white rounded-2xl shadow-sm p-4">
           {/* 日付ヘッダー */}
-          <div className="flex items-center gap-2 mb-3">
-            <span className={`text-sm font-bold
-              ${selectedInfo.isRed ? 'text-red-500' : selectedInfo.isSat ? 'text-blue-500' : 'text-gray-700'}`}>
-              {month}月{selectedDay}日({['日','月','火','水','木','金','土'][selectedInfo.dow]})
-            </span>
-            {selectedInfo.holidayName && (
-              <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full">
-                {selectedInfo.holidayName}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-bold
+                ${selectedInfo.isRed ? 'text-red-500' : selectedInfo.isSat ? 'text-blue-500' : 'text-gray-700'}`}>
+                {month}月{selectedDay}日({['日','月','火','水','木','金','土'][selectedInfo.dow]})
               </span>
+              {selectedInfo.holidayName && (
+                <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full">
+                  {selectedInfo.holidayName}
+                </span>
+              )}
+            </div>
+            {!showEventForm && (
+              <button
+                onClick={() => setShowEventForm(true)}
+                className="flex items-center gap-1 text-xs font-bold text-white bg-green-600
+                           px-2.5 py-1.5 rounded-xl shadow active:scale-95 transition-transform"
+              >
+                <Plus size={13} />山行登録
+              </button>
             )}
           </div>
+
+          {showEventForm && (
+            <EventForm
+              initialDate={selectedDateStr}
+              editTarget={selectedEvent || undefined}
+              onClose={() => setShowEventForm(false)}
+            />
+          )}
 
           {/* 確定イベント */}
           {selectedEvent && (

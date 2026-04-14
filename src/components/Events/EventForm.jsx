@@ -3,9 +3,9 @@ import { X } from 'lucide-react'
 import { MEMBERS } from '../../firebase/config'
 import { addEvent, updateEvent } from '../../hooks/useFirestore'
 
-export default function EventForm({ onClose, editTarget }) {
+export default function EventForm({ onClose, editTarget, initialDate }) {
   const today = new Date().toISOString().slice(0, 10)
-  const [date, setDate] = useState(today)
+  const [date, setDate] = useState(initialDate || today)
   const [time, setTime] = useState('06:00')
   const [destination, setDestination] = useState('')
   const [meetingPlace, setMeetingPlace] = useState('')
