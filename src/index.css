@@ -12,8 +12,6 @@ body {
 }
 
 #root {
-  max-width: 480px;
-  margin: 0 auto;
   min-height: 100svh;
   background: #f0f4f0;
   position: relative;

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { CalendarDays, Vote, CheckCircle, PencilLine } from 'lucide-react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Header from './components/layout/Header'
 import BottomNav from './components/layout/BottomNav'
@@ -10,14 +11,54 @@ import LoginScreen from './components/auth/LoginScreen'
 import PendingScreen from './components/auth/PendingScreen'
 import AdminPanel from './components/auth/AdminPanel'
 
+const NAV_TABS = [
+  { to: '/',             icon: CalendarDays, label: 'カレンダー' },
+  { to: '/candidates',   icon: Vote,         label: '投票'       },
+  { to: '/events',       icon: CheckCircle,  label: '山予定'     },
+  { to: '/availability', icon: PencilLine,   label: '入力'       },
+]
+
+function DesktopSideNav() {
+  return (
+    <aside className="hidden md:flex flex-col w-20 bg-white border-r border-gray-200 sticky top-0 h-screen shrink-0">
+      <div className="flex flex-col items-center pt-5 pb-4 gap-1">
+        <span className="text-2xl mb-3">⛰️</span>
+        {NAV_TABS.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className={({ isActive }) =>
+              `flex flex-col items-center w-full py-3 gap-1 text-xs font-medium transition-colors rounded-none
+               ${isActive ? 'text-orange-500 bg-orange-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'}`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
+                <span>{label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </div>
+    </aside>
+  )
+}
+
 function PageWrapper({ title, children }) {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header title={title} />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
-      <BottomNav />
+    <div className="flex min-h-screen">
+      <DesktopSideNav />
+      <div className="flex-1 flex flex-col min-h-screen">
+        <Header title={title} />
+        <main className="flex-1 overflow-y-auto">
+          <div className="md:max-w-3xl md:mx-auto">
+            {children}
+          </div>
+        </main>
+        <BottomNav />
+      </div>
     </div>
   )
 }

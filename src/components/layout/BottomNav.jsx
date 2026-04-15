@@ -10,7 +10,7 @@ const tabs = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40
+    <nav className="md:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-120 z-40
                     bg-white border-t border-gray-200 shadow-lg">
       <div className="flex">
         {tabs.map(({ to, icon: Icon, label }) => (
