@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Plus, Trash2, CalendarRange, CalendarDays } from 'lucide-react'
 import { addCandidate } from '../../hooks/useFirestore'
 import { formatDateInfo } from '../../utils/holidays'
+import { BRAND, BRAND_GRADIENT } from '../../utils/brand'
 
 function formatLabel(dateStr) {
   if (!dateStr) return { text: '', color: 'text-gray-700' }
@@ -71,7 +72,7 @@ export default function CandidateForm({ onClose }) {
   const canSubmit   = submitCount > 0
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-4 border border-orange-100">
+    <div className="bg-white rounded-2xl shadow-md p-4 border" style={{ borderColor: BRAND.orangeSoft }}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-gray-700">候補日を追加</h3>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -94,7 +95,8 @@ export default function CandidateForm({ onClose }) {
           type="button"
           onClick={() => setMode('range')}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all
-                      ${mode === 'range' ? 'bg-white text-orange-600 shadow' : 'text-gray-400'}`}
+                      ${mode === 'range' ? 'bg-white shadow' : 'text-gray-400'}`}
+          style={mode === 'range' ? { color: BRAND.orange } : undefined}
         >
           <CalendarRange size={14} />
           連休でまとめて
@@ -127,7 +129,8 @@ export default function CandidateForm({ onClose }) {
                       onChange={e => updateEntry(idx, 'date', e.target.value)}
                       required
                       className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs mb-2
-                                 focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+                                 focus:outline-none focus:ring-2 bg-white"
+                      style={{ '--tw-ring-color': BRAND.orangeSoft }}
                     />
                     <input
                       type="text"
@@ -135,7 +138,8 @@ export default function CandidateForm({ onClose }) {
                       onChange={e => updateEntry(idx, 'note', e.target.value)}
                       placeholder="備考（任意）"
                       className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs
-                                 focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+                                 focus:outline-none focus:ring-2 bg-white"
+                      style={{ '--tw-ring-color': BRAND.orangeSoft }}
                     />
                   </div>
                 )
@@ -145,8 +149,9 @@ export default function CandidateForm({ onClose }) {
               type="button"
               onClick={addEntry}
               className="w-full flex items-center justify-center gap-1.5 text-xs font-bold
-                         text-orange-500 border-2 border-dashed border-orange-200 rounded-xl py-2.5 mb-3
-                         hover:bg-orange-50 active:scale-95 transition-all"
+                         border-2 border-dashed rounded-xl py-2.5 mb-3
+                         active:scale-95 transition-all"
+              style={{ color: BRAND.orange, borderColor: BRAND.orangeSoft, background: 'transparent' }}
             >
               <Plus size={14} />
               日付を追加
@@ -157,7 +162,7 @@ export default function CandidateForm({ onClose }) {
         {/* ── 連休まとめモード ── */}
         {mode === 'range' && (
           <>
-            <div className="bg-orange-50 rounded-xl p-3 mb-3">
+            <div className="rounded-xl p-3 mb-3" style={{ background: BRAND.orangeTint }}>
               <div className="grid grid-cols-2 gap-2 mb-2">
                 <div>
                   <label className="text-xs text-gray-500 font-medium block mb-1">開始日</label>
@@ -167,7 +172,8 @@ export default function CandidateForm({ onClose }) {
                     onChange={e => setRangeFrom(e.target.value)}
                     required
                     className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs
-                               focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+                               focus:outline-none focus:ring-2 bg-white"
+                    style={{ '--tw-ring-color': BRAND.orangeSoft }}
                   />
                 </div>
                 <div>
@@ -179,7 +185,8 @@ export default function CandidateForm({ onClose }) {
                     onChange={e => setRangeTo(e.target.value)}
                     required
                     className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs
-                               focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+                               focus:outline-none focus:ring-2 bg-white"
+                    style={{ '--tw-ring-color': BRAND.orangeSoft }}
                   />
                 </div>
               </div>
@@ -189,7 +196,8 @@ export default function CandidateForm({ onClose }) {
                 onChange={e => setRangeNote(e.target.value)}
                 placeholder="備考（全日程共通・任意）"
                 className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs
-                           focus:outline-none focus:ring-2 focus:ring-orange-300 bg-white"
+                           focus:outline-none focus:ring-2 bg-white"
+                style={{ '--tw-ring-color': BRAND.orangeSoft }}
               />
             </div>
 
@@ -219,8 +227,9 @@ export default function CandidateForm({ onClose }) {
         <button
           type="submit"
           disabled={saving || !canSubmit}
-          className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl
+          className="w-full text-white font-bold py-3 rounded-xl
                      active:scale-95 transition-transform disabled:opacity-50 text-sm"
+          style={{ background: BRAND_GRADIENT }}
         >
           {saving ? '追加中...' : `${submitCount}日分の候補日を追加`}
         </button>

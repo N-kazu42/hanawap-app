@@ -5,6 +5,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { app, db } from './config'
+import { DEFAULT_USER_AVATAR } from '../utils/avatar'
 
 export const auth = initializeAuth(app, {
   persistence: browserLocalPersistence,
@@ -28,7 +29,7 @@ export async function ensureUserDoc(user) {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName || user.email.split('@')[0],
-      photoURL: user.photoURL || null,
+      photoURL: user.photoURL || DEFAULT_USER_AVATAR,
       status: user.email === OWNER_EMAIL ? 'approved' : 'pending',
       role: user.email === OWNER_EMAIL ? 'owner' : 'member',
       createdAt: serverTimestamp(),

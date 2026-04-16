@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { MEMBERS } from '../../firebase/config'
 import { addEvent, updateEvent } from '../../hooks/useFirestore'
+import { BRAND, BRAND_GRADIENT } from '../../utils/brand'
 
 export default function EventForm({ onClose, editTarget, initialDate }) {
   const today = new Date().toISOString().slice(0, 10)
@@ -12,6 +13,9 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
   const [note, setNote] = useState('')
   const [gear, setGear] = useState('')
   const [selectedMembers, setSelectedMembers] = useState(MEMBERS.map(m => m.name))
+  const [bringMeal, setBringMeal] = useState(false)
+  const [needChainSpikes, setNeedChainSpikes] = useState(false)
+  const [needGaiters, setNeedGaiters] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -23,6 +27,9 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
       setNote(editTarget.note || '')
       setGear(editTarget.gear || '')
       setSelectedMembers(editTarget.members || MEMBERS.map(m => m.name))
+      setBringMeal(editTarget.bringMeal || false)
+      setNeedChainSpikes(editTarget.needChainSpikes || false)
+      setNeedGaiters(editTarget.needGaiters || false)
     }
   }, [editTarget])
 
@@ -36,7 +43,7 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
     e.preventDefault()
     if (!destination || !date) return
     setSaving(true)
-    const data = { date, time, destination, meetingPlace, note, gear, members: selectedMembers }
+    const data = { date, time, destination, meetingPlace, note, gear, members: selectedMembers, bringMeal, needChainSpikes, needGaiters }
     if (editTarget) {
       await updateEvent(editTarget.id, data)
     } else {
@@ -47,7 +54,7 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-4 mb-4 border border-orange-100">
+    <div className="bg-white rounded-2xl shadow-md p-4 mb-4 border" style={{ borderColor: BRAND.orangeSoft }}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-bold text-gray-700">
           {editTarget ? '山行を編集' : '山行を登録'}
@@ -67,7 +74,8 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
             placeholder="例：北アルプス 涸沢"
             required
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-orange-300"
+                       focus:outline-none focus:ring-2"
+            style={{ '--tw-ring-color': BRAND.orangeSoft }}
           />
         </div>
 
@@ -80,7 +88,8 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
               onChange={e => setDate(e.target.value)}
               required
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                         focus:outline-none focus:ring-2 focus:ring-orange-300"
+                         focus:outline-none focus:ring-2"
+              style={{ '--tw-ring-color': BRAND.orangeSoft }}
             />
           </div>
           <div>
@@ -90,7 +99,8 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
               value={time}
               onChange={e => setTime(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                         focus:outline-none focus:ring-2 focus:ring-orange-300"
+                         focus:outline-none focus:ring-2"
+              style={{ '--tw-ring-color': BRAND.orangeSoft }}
             />
           </div>
         </div>
@@ -103,7 +113,8 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
             onChange={e => setMeetingPlace(e.target.value)}
             placeholder="例：松本駅 東口"
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-orange-300"
+                       focus:outline-none focus:ring-2"
+            style={{ '--tw-ring-color': BRAND.orangeSoft }}
           />
         </div>
 
@@ -133,7 +144,8 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
             placeholder="例：雨天中止。前日20時に判断。"
             rows={2}
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+                       focus:outline-none focus:ring-2 resize-none"
+            style={{ '--tw-ring-color': BRAND.orangeSoft }}
           />
         </div>
 
@@ -145,8 +157,31 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
             placeholder="例：レインウェア・アイゼン・ヘッドランプ"
             rows={2}
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+                       focus:outline-none focus:ring-2 resize-none"
+            style={{ '--tw-ring-color': BRAND.orangeSoft }}
           />
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-gray-500 block mb-2">装備・食事チェック</label>
+          <div className="flex flex-col gap-2">
+            {[
+              { label: '🍱 食事持参が必要', value: bringMeal, setter: setBringMeal },
+              { label: '⛓️ チェーンスパイクが必要', value: needChainSpikes, setter: setNeedChainSpikes },
+              { label: '🦵 ゲーターが必要', value: needGaiters, setter: setNeedGaiters },
+            ].map(({ label, value, setter }) => (
+              <label key={label} className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={value}
+                  onChange={e => setter(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                  style={{ accentColor: BRAND.orange }}
+                />
+                <span className="text-sm text-gray-700">{label}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <button
@@ -154,7 +189,7 @@ export default function EventForm({ onClose, editTarget, initialDate }) {
           disabled={saving || !destination || !date}
           className="w-full font-bold py-3 rounded-xl text-white
                      active:scale-95 transition-transform disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #1B4332, #40916C)' }}
+          style={{ background: BRAND_GRADIENT }}
         >
           {saving ? '保存中...' : editTarget ? '更新する' : '山行を登録'}
         </button>

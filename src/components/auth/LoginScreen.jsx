@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { signInWithEmail, signInWithGoogle } from '../../firebase/auth'
+import AppIcon from '../brand/AppIcon'
+import { BRAND, BRAND_GRADIENT, BRAND_PAGE_GRADIENT } from '../../utils/brand'
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
@@ -36,22 +38,17 @@ export default function LoginScreen() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #1B4332 0%, #2D6A4F 40%, #40916C 70%, #f0f4f0 100%)' }}>
-
+    <div className="min-h-screen flex flex-col" style={{ background: BRAND_PAGE_GRADIENT }}>
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* ロゴ */}
         <div className="text-center mb-10">
-          <div className="text-7xl mb-3">⛰️</div>
-          <h1 className="text-white text-3xl font-bold tracking-wide mb-1">Hanawap</h1>
-          <p className="text-green-200 text-sm">登山仲間のスケジュール管理</p>
+          <AppIcon className="w-24 h-24 rounded-[2rem] shadow-2xl mx-auto mb-4" />
+          <h1 className="text-3xl font-bold tracking-wide mb-1" style={{ color: BRAND.navyDeep }}>Hanawap</h1>
+          <p className="text-sm" style={{ color: BRAND.navy }}>山仲間の日程調整を、明るくひとつに。</p>
         </div>
 
-        {/* ログインカード */}
-        <div className="w-full max-w-sm bg-white rounded-3xl shadow-2xl p-6">
+        <div className="w-full max-w-sm bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 border" style={{ borderColor: BRAND.orangeSoft }}>
           <p className="text-sm font-bold text-gray-700 mb-4 text-center">ログイン</p>
 
-          {/* メール/パスワードフォーム */}
           <form onSubmit={handleEmailSubmit} className="space-y-3 mb-4">
             <div>
               <label className="text-xs font-medium text-gray-500 block mb-1">メールアドレス</label>
@@ -61,8 +58,8 @@ export default function LoginScreen() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="example@gmail.com"
                 required
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-green-300"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2"
+                style={{ '--tw-ring-color': BRAND.orangeSoft }}
               />
             </div>
 
@@ -74,8 +71,8 @@ export default function LoginScreen() {
                 onChange={e => setPassword(e.target.value)}
                 placeholder="パスワード"
                 required
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-green-300"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2"
+                style={{ '--tw-ring-color': BRAND.orangeSoft }}
               />
             </div>
 
@@ -86,30 +83,25 @@ export default function LoginScreen() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-2xl text-white font-bold text-sm
-                         active:scale-95 transition-all disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg, #1B4332, #40916C)' }}
+              className="w-full py-3 rounded-2xl text-white font-bold text-sm active:scale-95 transition-all disabled:opacity-60"
+              style={{ background: BRAND_GRADIENT }}
             >
               {loading ? 'ログイン中...' : 'ログイン'}
             </button>
           </form>
 
-          {/* 区切り */}
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-gray-200" />
             <span className="text-xs text-gray-400">または</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
-          {/* Googleログイン */}
           <button
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 py-3 rounded-2xl
-                       border border-gray-200 text-sm font-medium text-gray-700
-                       hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-3 py-3 rounded-2xl border text-sm font-medium text-gray-700 hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-60"
+            style={{ borderColor: BRAND.orangeSoft }}
           >
-            {/* Google SVGロゴ */}
             <svg width="18" height="18" viewBox="0 0 48 48">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
               <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -118,7 +110,6 @@ export default function LoginScreen() {
             </svg>
             {googleLoading ? 'ログイン中...' : 'Googleでログイン'}
           </button>
-
         </div>
       </div>
     </div>
@@ -127,11 +118,11 @@ export default function LoginScreen() {
 
 function getErrorMessage(code) {
   const map = {
-    'auth/user-not-found':     'メールアドレスが登録されていません',
-    'auth/wrong-password':     'パスワードが間違っています',
-    'auth/invalid-credential': 'メールアドレスまたはパスワードが間違っています',
-    'auth/invalid-email':      'メールアドレスの形式が正しくありません',
-    'auth/too-many-requests':  'しばらく時間をおいてから再試行してください',
+    'auth/user-not-found': 'メールアドレスが見つかりません',
+    'auth/wrong-password': 'パスワードが違います',
+    'auth/invalid-credential': 'メールアドレスまたはパスワードが違います',
+    'auth/invalid-email': 'メールアドレスの形式が正しくありません',
+    'auth/too-many-requests': 'しばらく待ってから再度お試しください',
   }
   return map[code] || 'エラーが発生しました。もう一度お試しください。'
 }
